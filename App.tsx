@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HematologyScene } from './components/HematologyScene';
-import { 
-  DiagnosticChecklist, 
-  GenomicGrid, 
-  PrognosisScoreboard, 
-  TreatmentTree, 
+import {
+  DiagnosticChecklist,
+  GenomicGrid,
+  PrognosisScoreboard,
+  TreatmentTree,
   DifferentialDiagnosisTable,
   SubtypeComparison,
   TreatmentIndications,
   FutureTherapies
 } from './components/CMMLDiagrams';
-import { 
-  ArrowDown, Menu, X, Microscope, Activity, ShieldCheck, 
+import {
+  ArrowDown, Menu, X, Microscope, Activity, ShieldCheck,
   HeartPulse, ListChecks, Info, Beaker, FileText, Globe,
   Stethoscope, Droplets
 } from 'lucide-react';
+import RemoteControl from './components/RemoteControl';
+import RemoteOverlay from './components/RemoteOverlay';
+import { usePresenterReceiver } from './hooks/useRemoteControl';
 
 const BloodDoctorLogo = ({ className = "" }: { className?: string }) => (
   <div className={`flex items-center gap-1 font-serif font-bold tracking-tight ${className}`}>
@@ -31,9 +34,23 @@ const AuthorBadge = ({ name, affiliation }: { name: string; affiliation: string 
   </div>
 );
 
+const isRemoteMode = new URLSearchParams(window.location.search).get('remote') === 'true';
+
 const App: React.FC = () => {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigateToSection = useCallback((id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      window.scrollTo({ top: offsetPosition, behavior: "smooth" });
+    }
+  }, []);
+
+  const { remoteConnected } = usePresenterReceiver(navigateToSection);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -45,15 +62,13 @@ const App: React.FC = () => {
     return (e: React.MouseEvent) => {
       e.preventDefault();
       setMenuOpen(false);
-      const element = document.getElementById(id);
-      if (element) {
-        const headerOffset = 80;
-        const elementPosition = element.getBoundingClientRect().top;
-        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-        window.scrollTo({ top: offsetPosition, behavior: "smooth" });
-      }
+      navigateToSection(id);
     };
   };
+
+  if (isRemoteMode) {
+    return <RemoteControl />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-med-red/20 font-sans">
@@ -398,6 +413,8 @@ const App: React.FC = () => {
             © 2025 British Journal of Haematology. For medical educational use only.
         </div>
       </footer>
+
+      <RemoteOverlay remoteConnected={remoteConnected} />
     </div>
   );
 };
