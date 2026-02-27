@@ -9,7 +9,7 @@ import {
   SubtypeComparison,
   TreatmentIndications,
   FutureTherapies
-} from './components/CMMLDiagrams';
+} from './components/ClinicalDiagrams';
 import { 
   ArrowDown, Menu, X, Microscope, Activity, ShieldCheck, 
   HeartPulse, ListChecks, Info, Beaker, FileText, Globe,
@@ -65,7 +65,7 @@ const App: React.FC = () => {
             <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
               <div className="w-8 h-8 bg-med-red rounded flex items-center justify-center text-white font-serif font-bold shadow-sm">B</div>
               <span className={`font-serif font-bold text-lg tracking-tight transition-opacity ${scrolled ? 'opacity-100' : 'opacity-0 md:opacity-100'}`}>
-                BJHaem <span className="font-normal text-slate-400 ml-2">Review 2025</span>
+                Blood Doctor <span className="font-normal text-slate-400 ml-2">Haematology</span>
               </span>
             </div>
             <div className={`h-6 w-px bg-slate-200 transition-opacity ${scrolled ? 'opacity-100' : 'opacity-0'}`}></div>
@@ -100,7 +100,7 @@ const App: React.FC = () => {
           </div>
           
           <h1 className="font-serif text-4xl md:text-6xl lg:text-8xl font-medium leading-[1.1] mb-8 text-slate-900 max-w-5xl mx-auto">
-            Clinical Management <br/><span className="italic font-light">of</span> CMML
+            Blood Doctor <br/><span className="italic font-light">Haematology Learning</span>
           </h1>
           
           <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -377,7 +377,7 @@ const App: React.FC = () => {
             <div className="text-center md:text-left">
                 <div className="text-white font-serif font-bold text-2xl mb-2 flex items-center gap-2">
                   <ShieldCheck className="text-med-red" size={28} />
-                  CMML Digital Review
+                  Blood Doctor
                 </div>
                 <div className="flex items-center gap-2 mt-4 text-xs">
                   <span className="text-slate-400">Curated by</span>
@@ -395,7 +395,7 @@ const App: React.FC = () => {
             </div>
         </div>
         <div className="text-center mt-12 text-[9px] text-slate-700 uppercase tracking-[0.3em]">
-            © 2025 British Journal of Haematology. For medical educational use only.
+            © 2025 Blood Doctor by Dr Abdul Mannan. For medical educational use only.
         </div>
       </footer>
     </div>

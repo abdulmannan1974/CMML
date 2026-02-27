@@ -1,17 +1,12 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Blood Doctor
 
-# Run and deploy your AI Studio app
+**Interactive Haematology Learning & Clinical Tools**
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/12Qrr5hfQlsLjlV7ZKApg7z7saZOrdEQA
+A mobile-first web application for healthcare professionals studying blood disorders — produced by Dr Abdul Mannan (FRCPath FCPS).
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
-
+**Prerequisites:** Node.js
 
 1. Install dependencies:
    `npm install`
