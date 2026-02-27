@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { HematologyScene } from './components/HematologyScene';
 import { 
   DiagnosticChecklist, 
@@ -84,6 +85,37 @@ const App: React.FC = () => {
             {menuOpen ? <X /> : <Menu />}
           </button>
         </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-white/95 backdrop-blur-md border-t border-slate-200 overflow-hidden"
+            >
+              <div className="container mx-auto px-6 py-6 flex flex-col gap-4">
+                {[
+                  { id: 'pathophysiology', label: 'Pathogenesis' },
+                  { id: 'diagnosis', label: 'Diagnosis' },
+                  { id: 'prognosis', label: 'Prognosis' },
+                  { id: 'therapy', label: 'Therapy' },
+                  { id: 'future', label: 'Future' },
+                ].map((item) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    onClick={scrollToSection(item.id)}
+                    className="text-sm font-bold tracking-widest text-slate-600 uppercase hover:text-med-red transition-colors py-2 border-b border-slate-100 last:border-0"
+                  >
+                    {item.label}
+                  </a>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Hero Section */}
