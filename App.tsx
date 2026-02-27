@@ -377,7 +377,7 @@ const App: React.FC = () => {
             <div className="text-center md:text-left">
                 <div className="text-white font-serif font-bold text-2xl mb-2 flex items-center gap-2">
                   <ShieldCheck className="text-med-red" size={28} />
-                  CMML Digital Review
+                  Blood Doctor
                 </div>
                 <div className="flex items-center gap-2 mt-4 text-xs">
                   <span className="text-slate-400">Curated by</span>

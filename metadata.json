@@ -1,5 +1,5 @@
 {
-  "name": "CMML: State of the Art Review",
-  "description": "An interactive clinical review of Chronic Myelomonocytic Leukaemia management.",
+  "name": "Blood Doctor",
+  "description": "An interactive clinical review of haematologic malignancies and their management.",
   "requestFramePermissions": []
 }
