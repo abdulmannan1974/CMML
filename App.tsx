@@ -11,16 +11,30 @@ import {
   FutureTherapies
 } from './components/CMMLDiagrams';
 import { 
-  ArrowDown, Menu, X, Microscope, Activity, ShieldCheck, 
+  ArrowDown, Menu, X, Microscope, Activity, ShieldCheck,
   HeartPulse, ListChecks, Info, Beaker, FileText, Globe,
-  Stethoscope, Droplets
+  Stethoscope
 } from 'lucide-react';
 
+const BloodDropIcon = ({ size = 28, className = "" }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
+    {/* Blood drop shape */}
+    <path d="M32 4C32 4 12 30 12 42C12 53.05 20.95 62 32 62C43.05 62 52 53.05 52 42C52 30 32 4 32 4Z" fill="#DC2626" stroke="#991B1B" strokeWidth="2"/>
+    {/* Highlight/shine on drop */}
+    <ellipse cx="24" cy="38" rx="5" ry="8" fill="white" opacity="0.3" transform="rotate(-15 24 38)"/>
+    {/* Medical cross inside */}
+    <rect x="28" y="32" width="8" height="20" rx="2" fill="white" opacity="0.9"/>
+    <rect x="22" y="38" width="20" height="8" rx="2" fill="white" opacity="0.9"/>
+  </svg>
+);
+
 const BloodDoctorLogo = ({ className = "" }: { className?: string }) => (
-  <div className={`flex items-center gap-1 font-serif font-bold tracking-tight ${className}`}>
-    <span className="text-slate-900">Blood</span>
-    <Droplets size={20} className="text-red-600 fill-red-600 animate-pulse" />
-    <span className="text-red-700">Doctor</span>
+  <div className={`flex items-center gap-2 font-serif font-bold tracking-tight ${className}`}>
+    <BloodDropIcon size={32} className="animate-pulse drop-shadow-md" />
+    <div className="flex flex-col leading-none">
+      <span className="text-slate-900 text-[1em]">Blood</span>
+      <span className="text-red-700 text-[1em]">Doctor</span>
+    </div>
   </div>
 );
 
@@ -93,7 +107,7 @@ const App: React.FC = () => {
 
         <div className="relative z-10 container mx-auto px-6 text-center pt-20">
           <div className="flex flex-col items-center gap-4 mb-6">
-            <BloodDoctorLogo className="text-2xl" />
+            <BloodDoctorLogo className="text-3xl md:text-4xl" />
             <div className="inline-block px-4 py-1 border border-med-red text-med-red text-[10px] tracking-[0.3em] uppercase font-black rounded-full bg-white/50 backdrop-blur-sm">
               State-of-the-Art Review
             </div>
