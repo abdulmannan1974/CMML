@@ -25,8 +25,17 @@ loadEnv();
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
+const BOT_TRIGGER = (process.env.BOT_TRIGGER || 'ai').toLowerCase();
 const SYSTEM_PROMPT = process.env.SYSTEM_PROMPT ||
-  'You are a helpful assistant responding via WhatsApp. Keep replies concise and well-formatted for mobile reading. Use short paragraphs.';
+  `You are a knowledgeable teaching assistant in a WhatsApp study group.
+Your role:
+- Answer student questions clearly and accurately
+- Explain complex concepts in simple terms
+- Give examples when helpful
+- Encourage learning and curiosity
+- Keep replies concise for mobile reading (use short paragraphs)
+- Use *bold* for key terms and numbered lists for steps
+- If a question is unclear, ask for clarification`;
 
 if (!ANTHROPIC_API_KEY) {
   console.error('ERROR: ANTHROPIC_API_KEY is required.');
@@ -136,7 +145,31 @@ async function startBot() {
 
       if (!text) continue;
 
-      // Handle commands
+      const isGroup = jid.endsWith('@g.us');
+      const senderName = msg.pushName || 'Someone';
+
+      // In groups: only respond to trigger word or commands
+      // In private chats: respond to everything
+      if (isGroup) {
+        const lowerText = text.toLowerCase();
+        const triggered =
+          lowerText.startsWith(BOT_TRIGGER + ' ') ||
+          lowerText.startsWith(BOT_TRIGGER + ',') ||
+          lowerText === BOT_TRIGGER ||
+          text.startsWith('/');
+
+        if (!triggered) continue;
+      }
+
+      // Strip trigger word from the question
+      let question = text;
+      if (isGroup && !text.startsWith('/')) {
+        // Remove "ai " or "ai," prefix
+        question = text.replace(new RegExp(`^${BOT_TRIGGER}[,:\\s]+`, 'i'), '').trim();
+        if (!question) continue;
+      }
+
+      // Handle commands (work in both groups and private)
       if (text.startsWith('/')) {
         const command = text.slice(1).toLowerCase().trim();
 
@@ -147,14 +180,19 @@ async function startBot() {
         }
 
         if (command === 'help') {
+          const triggerInfo = isGroup
+            ? `In groups, start your message with *${BOT_TRIGGER}* to ask me.\n` +
+              `Example: _${BOT_TRIGGER} what is hemoglobin?_\n\n`
+            : '';
           await sock.sendMessage(jid, {
             text:
-              '🤖 *WhatsApp Claude Bot*\n\n' +
-              'Send any message and I\'ll respond using Claude AI.\n\n' +
+              '🤖 *Claude Teaching Assistant*\n\n' +
+              triggerInfo +
               '*Commands:*\n' +
               '• /reset — Clear conversation history\n' +
               '• /help — Show this help message\n' +
-              '• /model — Show current AI model',
+              '• /model — Show current AI model\n' +
+              '• /topic — Set a topic for focused Q&A',
           });
           continue;
         }
@@ -163,26 +201,42 @@ async function startBot() {
           await sock.sendMessage(jid, { text: `🧠 Current model: *${CLAUDE_MODEL}*` });
           continue;
         }
+
+        if (command.startsWith('topic ')) {
+          const topic = command.slice(6).trim();
+          if (topic) {
+            chatHistory.delete(jid);
+            addToHistory(jid, 'user', `The study topic is: ${topic}. Please focus answers on this subject.`);
+            addToHistory(jid, 'assistant', `Got it! I'm now focused on *${topic}*. Ask me anything about it.`);
+            await sock.sendMessage(jid, {
+              text: `📚 Topic set to: *${topic}*\n\nConversation history cleared. Ask your questions!`,
+            });
+          }
+          continue;
+        }
+
+        continue;
       }
 
-      // Send to Claude
-      console.log(`📨 [${jid}]: ${text.slice(0, 80)}${text.length > 80 ? '...' : ''}`);
+      // Prefix with sender name in groups for context
+      const messageForClaude = isGroup
+        ? `[${senderName} asks]: ${question}`
+        : question;
+
+      console.log(`📨 [${isGroup ? 'GROUP' : 'DM'}] ${senderName}: ${question.slice(0, 80)}${question.length > 80 ? '...' : ''}`);
 
       try {
-        // Show typing indicator
         await sock.sendPresenceUpdate('composing', jid);
 
-        const reply = await askClaude(jid, text);
+        const reply = await askClaude(jid, messageForClaude);
 
-        // Stop typing indicator
         await sock.sendPresenceUpdate('paused', jid);
 
-        // Send reply (split if too long for WhatsApp)
+        // Send reply (split if too long)
         const MAX_MSG_LENGTH = 4000;
         if (reply.length <= MAX_MSG_LENGTH) {
           await sock.sendMessage(jid, { text: reply });
         } else {
-          // Split into chunks
           const chunks = [];
           for (let i = 0; i < reply.length; i += MAX_MSG_LENGTH) {
             chunks.push(reply.slice(i, i + MAX_MSG_LENGTH));
@@ -197,7 +251,7 @@ async function startBot() {
         console.error(`❌ Error processing message from ${jid}:`, error.message);
         await sock.sendPresenceUpdate('paused', jid);
         await sock.sendMessage(jid, {
-          text: '⚠️ Sorry, I encountered an error processing your message. Please try again.',
+          text: '⚠️ Sorry, I encountered an error. Please try again.',
         });
       }
     }
