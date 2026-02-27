@@ -31,7 +31,81 @@ const AuthorBadge = ({ name, affiliation }: { name: string; affiliation: string 
   </div>
 );
 
+const ActivationScreen = ({ onActivate }: { onActivate: () => void }) => {
+  const [pulse, setPulse] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setPulse(true), 600);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="fixed inset-0 z-[100] bg-slate-950 flex flex-col items-center justify-center overflow-hidden">
+      {/* Animated background cells */}
+      <div className="absolute inset-0 overflow-hidden opacity-10">
+        {Array.from({ length: 20 }).map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full border border-red-500/30"
+            style={{
+              width: `${30 + Math.random() * 60}px`,
+              height: `${30 + Math.random() * 60}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `float ${8 + Math.random() * 12}s ease-in-out infinite`,
+              animationDelay: `${Math.random() * 5}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      <div className={`relative z-10 flex flex-col items-center transition-all duration-1000 ${pulse ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+        {/* Logo mark */}
+        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center mb-8 shadow-2xl shadow-red-900/50">
+          <Droplets size={48} className="text-white" />
+        </div>
+
+        {/* Title */}
+        <h1 className="font-serif text-5xl md:text-7xl font-bold text-white mb-2 tracking-tight text-center">
+          Blood Doctor
+        </h1>
+        <span className="text-red-400 text-lg md:text-xl font-bold tracking-[0.4em] uppercase mb-12">
+          AI
+        </span>
+
+        <p className="text-slate-400 text-sm md:text-base max-w-md text-center mb-12 leading-relaxed">
+          Clinical haematology intelligence. Evidence-based reviews curated by Dr Abdul Mannan.
+        </p>
+
+        {/* Activation button */}
+        <button
+          onClick={onActivate}
+          className="group relative px-10 py-4 bg-red-700 hover:bg-red-600 text-white font-bold text-sm uppercase tracking-[0.3em] rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-red-900/40 hover:scale-105 active:scale-95"
+        >
+          <span className="relative z-10 flex items-center gap-3">
+            <ShieldCheck size={20} />
+            Activate
+          </span>
+        </button>
+
+        <p className="mt-8 text-slate-600 text-[10px] uppercase tracking-[0.3em]">
+          For medical educational use only
+        </p>
+      </div>
+
+      <style>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          33% { transform: translateY(-20px) rotate(5deg); }
+          66% { transform: translateY(10px) rotate(-3deg); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 const App: React.FC = () => {
+  const [activated, setActivated] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -54,6 +128,10 @@ const App: React.FC = () => {
       }
     };
   };
+
+  if (!activated) {
+    return <ActivationScreen onActivate={() => setActivated(true)} />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 selection:bg-med-red/20 font-sans">
